@@ -2,6 +2,8 @@ import iziToast from 'izitoast';
 import 'izitoast/dist/css/iziToast.min.css';
 import axios from 'axios';
 import resetGallery from './gallery';
+axios.defaults.baseURL = 'https://pixabay.com/';
+
 
 const elements = {
   form: document.querySelector('#search-form'),
@@ -33,7 +35,7 @@ const AppState = {
 AppState.hideLoader()
 
 async function fetchImages(q,page) {
-  return await axios.get('https://pixabay.com/api', {
+  return await axios.get('api/', {
     params: {
       key: '42155230-030ff0e38ddad02fbff1fc379',
       page: page,
