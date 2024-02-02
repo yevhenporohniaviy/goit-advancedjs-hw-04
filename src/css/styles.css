@@ -5,21 +5,57 @@
   |============================
 */
 @import url('./reset.css');
-@import url('./vite-promo.css');
-@import url('./header.css');
 
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
+.header-form {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background-color: blueviolet;
+}
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  grid-column-gap: 20px;
+  grid-row-gap: 40px;
+  margin-top: 90px;
+}
+@media (min-width: 520px) {
+  .gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 768px) {
+  .gallery {
+    grid-template-columns: repeat(3, 1fr); 
+  }
+}
+.gallery img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+@media (min-width: 520px) {
+  .gallery img{
+    height: 300px;
+  }
+}
 
-  color: #242424;
-  background-color: rgba(255, 255, 255, 0.87);
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
+@media (min-width: 768px) {
+  .gallery img{
+    height: 400px;
+  }
+}
+.gallery .info-item {
+  font-size: 21px;
+  display: flex;
+  flex-direction: column;
+}
+.gallery .info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-column-gap: 20px;
 }
