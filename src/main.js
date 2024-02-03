@@ -39,7 +39,10 @@ async function fetchImages(q,page) {
     params: {
       key: '42155230-030ff0e38ddad02fbff1fc379',
       page: page,
-      q: q
+      orientation: 'horizontal',
+      safesearch: true,
+      per_page: 40,
+      q: q,
     },
   });
 }
@@ -86,11 +89,11 @@ elements.form.addEventListener('submit', handleSubmitForm);
 
 function handleSubmitForm(e) {
   e.preventDefault();
+
   const { searchQuery } = e.currentTarget.elements;
-
-  if (!searchQuery.value) return;
-
-  AppState.updateQuery(searchQuery.value.trim());
+  const trimValue = searchQuery.value.trim();
+  if (!trimValue) return;
+  AppState.updateQuery(trimValue);
   AppState.resetPage();
   
   handleFetchImages();
@@ -106,7 +109,7 @@ async function handleFetchImages() {
       iziToast.show({
         color: 'red',
         position: 'topRight',
-        message: `"We're sorry, but you've reached the end of search results."`,
+        message: `"We're sorry, repeat search."`,
       });
       throw new Error('Error');
     }
@@ -118,6 +121,10 @@ async function handleFetchImages() {
     elements.gallery.innerHTML = createGallery(data);
     observer.observe(AppState.loader);
     resetGallery()
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
     AppState.showLoader();
   } catch (error) {
     console.log(error)
@@ -125,7 +132,7 @@ async function handleFetchImages() {
 }
 
 let observer = new IntersectionObserver(handleObserve, {
-  rootMargin: '450px',
+  rootMargin: '500px',
 });
 
 
@@ -139,20 +146,31 @@ function handleObserve(entries, observer) {
 }
 
 async function handleLoadMoreFetchImages() {
-  
+
    try {
      const { data } = await fetchImages(AppState.query, AppState.page);
-     const pages = Math.round(data.totalHits / 5);
-     if (AppState.page > pages) observer.unobserve(AppState.loader);
-     elements.gallery.insertAdjacentHTML('beforeend', createGallery(data));
-     
-      const { height: cardHeight } = elements.gallery.firstElementChild.getBoundingClientRect();
-      window.scrollBy({
-        top: cardHeight * 2.5, 
-        behavior: 'smooth',
-      });
+     const pages = Math.ceil(data.totalHits / 40);
+     if (AppState.page > pages) {
+       AppState.hideLoader()
+       observer.unobserve(AppState.loader);
+       iziToast.show({
+         color: 'red',
+         position: 'topRight',
+         message: `"We're sorry, but you've reached the end of search results."`,
+       });
+     }
+     else {
+       elements.gallery.insertAdjacentHTML('beforeend', createGallery(data));
 
-     resetGallery();
+       const { height: cardHeight } =
+         elements.gallery.firstElementChild.getBoundingClientRect();
+       window.scrollBy({
+         top: cardHeight * 2.5,
+         behavior: 'smooth',
+       });
+       resetGallery();
+     }     
+    
    } catch (error) {
      console.log(error)
   }
