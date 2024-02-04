@@ -39,6 +39,7 @@ async function fetchImages(q,page) {
     params: {
       key: '42155230-030ff0e38ddad02fbff1fc379',
       page: page,
+      image_type: 'photo',
       orientation: 'horizontal',
       safesearch: true,
       per_page: 40,
@@ -113,6 +114,17 @@ async function handleFetchImages() {
       });
       throw new Error('Error');
     }
+    const pages = Math.ceil(data.totalHits / 40);
+    if (AppState.page === pages) {
+      AppState.hideLoader();
+      iziToast.show({
+        color: 'red',
+        position: 'topRight',
+        message: `"We're sorry, but you've reached the end of search results."`,
+      });
+    } else {
+      AppState.showLoader();
+    }
     iziToast.show({
       color: 'green',
       position: 'topRight',
@@ -121,11 +133,8 @@ async function handleFetchImages() {
     elements.gallery.innerHTML = createGallery(data);
     observer.observe(AppState.loader);
     resetGallery()
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth',
-    });
-    AppState.showLoader();
+  
+    
   } catch (error) {
     console.log(error)
   }
@@ -146,11 +155,10 @@ function handleObserve(entries, observer) {
 }
 
 async function handleLoadMoreFetchImages() {
-
    try {
      const { data } = await fetchImages(AppState.query, AppState.page);
      const pages = Math.ceil(data.totalHits / 40);
-     if (AppState.page > pages) {
+     if (AppState.page === pages) {
        AppState.hideLoader()
        observer.unobserve(AppState.loader);
        iziToast.show({
@@ -159,7 +167,7 @@ async function handleLoadMoreFetchImages() {
          message: `"We're sorry, but you've reached the end of search results."`,
        });
      }
-     else {
+     
        elements.gallery.insertAdjacentHTML('beforeend', createGallery(data));
 
        const { height: cardHeight } =
@@ -169,7 +177,7 @@ async function handleLoadMoreFetchImages() {
          behavior: 'smooth',
        });
        resetGallery();
-     }     
+         
     
    } catch (error) {
      console.log(error)
